@@ -26,7 +26,7 @@ app.post('/persons', jwtAuth, (req, res) => {
     res.status(201).send({message: `created person with id ${personId}`});
 });
 
-app.get('/persons/:id', (req, res) => {
+app.get('/persons/:id', jwtAuth, (req, res) => {
     const person = db.persons[req.params.id];
 
     res.json({person});
