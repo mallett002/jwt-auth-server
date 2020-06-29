@@ -16,7 +16,7 @@ module.exports = {
             name: 'bKiefer',
             age: 37,
             favoriteLanguage: 'Java',
-            preferredHobby: 'grilling'
+            preferredHobby: 'using his traeger'
         },
         4: {
             name: 'Travis',
@@ -64,7 +64,7 @@ module.exports = {
             name: 'Andrew',
             age: 33,
             favoriteLanguage: 'JavaScript',
-            preferredHobby: 'hunting'
+            preferredHobby: 'fishing'
         }
     },
     users : {
