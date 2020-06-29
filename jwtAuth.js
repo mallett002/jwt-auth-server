@@ -10,11 +10,11 @@ module.exports = (req, res, next) => {
 
             jwt.verify(token, JWT_SECRET);
 
-            return next();
+            next();
         } catch (err) {
-            return res.status(403).json(err);
+            res.status(403).json(err);
         }
+    } else {
+        res.status(403).json({message: 'No auth header'});
     }
-
-    res.status(403).json({message: 'No auth header'});
 };
