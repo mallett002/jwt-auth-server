@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const db = require('./database');
 const {JWT_SECRET} = require('./constants');
-const jwtAuth = require('./jwtAuth');
+const {validateJwt} = require('./jwtAuth');
 const randToken = require('rand-token');
 const refreshTokens = {};
 
@@ -13,11 +13,11 @@ app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.json('Howdy'));
 
-app.get('/persons', jwtAuth, (req, res) => {
+app.get('/persons', validateJwt, (req, res) => {
     res.json(db.persons);
 });
 
-app.post('/persons', jwtAuth, (req, res) => {
+app.post('/persons', validateJwt, (req, res) => {
     const person = req.body;
     const personId = Object.keys(db).length + 1;
 
@@ -26,26 +26,32 @@ app.post('/persons', jwtAuth, (req, res) => {
     res.status(201).send({message: `created person with id ${personId}`});
 });
 
-app.get('/persons/:id', jwtAuth, (req, res) => {
+app.get('/persons/:id', validateJwt, (req, res) => {
     const person = db.persons[req.params.id];
 
     res.json({person});
 });
 
 app.post('/authenticate', (req, res) => {
-    const user = req.body;
+    const payloadUser = req.body;
 
-    if (user.email in db.users) {
-        const options = {
-            subject: user.email,
-            expiresIn: '15m'
+    if (payloadUser.email in db.users) {
+        const dbUser = db.users[payloadUser.email];
+
+        if (payloadUser.password !== dbUser.password) {
+            return res.status(401).json('Invalid credentials');
+        }
+
+        const jwtOptions = {
+            subject: payloadUser.email,
+            expiresIn: '1m'
         };
 
         try {
-            const token = jwt.sign({email: user.email}, JWT_SECRET, options);
+            const token = jwt.sign({name: dbUser.name}, JWT_SECRET, jwtOptions);
             const refreshToken = randToken.uid(256);
     
-            refreshTokens[user.email] = refreshToken;
+            refreshTokens[payloadUser.email] = refreshToken;
     
             return res.json({
                 jwtToken: token,
@@ -56,20 +62,21 @@ app.post('/authenticate', (req, res) => {
         }
     }
 
-    res.status(404).json(`User with email ${user.email} does not exist`);
+    res.status(404).json(`User with email ${payloadUser.email} does not exist`);
 });
 
 app.post('/token', (req, res) => {
     const {email, refreshToken} = req.body;
 
     if (refreshTokens[email] === refreshToken) {
-        const options = {
+        const {name} = db.users[email];
+        const jwtOptions = {
             subject: email,
             expiresIn: '15m'
         };
 
         try {
-            const token = jwt.sign({email}, JWT_SECRET, options);
+            const token = jwt.sign({name}, JWT_SECRET, jwtOptions);
 
             return res.json({
                 jwtToken: token

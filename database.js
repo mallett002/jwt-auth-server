@@ -68,6 +68,9 @@ module.exports = {
         }
     },
     users : {
-        'willmallett@gmail.com': 'password'
+        'willmallett@gmail.com': {
+            password: 'password',
+            name: 'Will Mallett'
+        }
     }
 };
