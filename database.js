@@ -53,6 +53,16 @@ module.exports = {
         favoriteLanguage: 'miro',
         preferredHobby: 'marketing stuff'
     },
-    10: {},
-    11: {}
+    10: {
+        name: 'Dalton',
+        age: 18,
+        favoriteLanguage: 'php',
+        preferredHobby: 'road trips'
+    },
+    11: {
+        name: 'Andrew',
+        age: 33,
+        favoriteLanguage: 'JavaScript',
+        preferredHobby: 'hunting'
+    }
 };
