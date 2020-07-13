@@ -65,7 +65,7 @@ app.post('/authenticate', (req, res) => {
     res.status(404).json(`User with email ${payloadUser.email} does not exist`);
 });
 
-app.post('/token', (req, res) => {
+app.post('/refresh', (req, res) => {
     const {email, refreshToken} = req.body;
 
     if (refreshTokens[email] === refreshToken) {
