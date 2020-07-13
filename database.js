@@ -61,10 +61,10 @@ module.exports = {
             preferredHobby: 'road trips'
         },
         11: {
-            name: 'Andrew',
-            age: 33,
-            favoriteLanguage: 'JavaScript',
-            preferredHobby: 'fishing'
+            name: 'Melanie',
+            age: 22,
+            favoriteLanguage: 'Java',
+            preferredHobby: 'dancing'
         }
     },
     users : {
