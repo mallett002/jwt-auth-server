@@ -15,7 +15,7 @@ const validateJwt = (req, res, next) => {
             res.status(403).json(err);
         }
     } else {
-        res.status(403).json({message: 'No auth header'});
+        res.sendStatus(403);
     }
 };
 

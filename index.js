@@ -44,7 +44,7 @@ app.post('/authenticate', (req, res) => {
 
         const jwtOptions = {
             subject: payloadUser.email,
-            expiresIn: '1m'
+            expiresIn: '5m'
         };
 
         try {
@@ -54,7 +54,7 @@ app.post('/authenticate', (req, res) => {
             refreshTokens[payloadUser.email] = refreshToken;
     
             return res.json({
-                jwtToken: token,
+                accessToken: token,
                 refreshToken
             });
         } catch (err) {
@@ -79,7 +79,7 @@ app.post('/token', (req, res) => {
             const token = jwt.sign({name}, JWT_SECRET, jwtOptions);
 
             return res.json({
-                jwtToken: token
+                accessToken: token
             });
         } catch (err) {
             res.status(500).json(err);
