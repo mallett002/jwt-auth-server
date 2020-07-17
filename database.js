@@ -64,7 +64,7 @@ module.exports = {
             name: 'Melanie',
             age: 22,
             favoriteLanguage: 'Java',
-            preferredHobby: 'dancing'
+            preferredHobby: 'spending time with her kids'
         }
     },
     users : {
