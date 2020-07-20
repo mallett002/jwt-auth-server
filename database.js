@@ -22,7 +22,7 @@ module.exports = {
             name: 'Travis',
             age: 30,
             favoriteLanguage: 'c#',
-            preferredHobby: 'racing'
+            preferredHobby: 'street racing'
         },
         5: {
             name: 'Lux',
