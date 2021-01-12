@@ -1,11 +1,14 @@
 const jwt = require('jsonwebtoken');
 
 const {validateJwt} = require('../src/jwtAuth');
+const {JWT_SECRET} = require('../src/constants');
 
 jest.mock('jsonwebtoken');
 
 describe('jwtAuth', () => {
-    let req, res, next;
+    let req,
+        res,
+        next;
 
     describe('validateJwt', () => {
         describe('when no auth header', () => {
@@ -36,19 +39,24 @@ describe('jwtAuth', () => {
                 authHeader = `Bearer ${token}`;
                 reqHeader = jest.fn().mockReturnValue(authHeader);
                 req = {
-                    header: jest.fn(),
+                    header: reqHeader
                 };
-
                 res = {
                     sendStatus: jest.fn(),
                     status: jest.fn()
                 };
-
                 next = jest.fn();
+
+                validateJwt(req, res, next);
+            });
+
+            it('should verify the token', () => {
+                expect(jwt.verify).toHaveBeenCalledTimes(1);
+                expect(jwt.verify).toHaveBeenCalledWith(token, JWT_SECRET);
             });
 
             it('should call next', () => {
-
+                expect(next).toHaveBeenCalledTimes(1);
             });
         });
     });
