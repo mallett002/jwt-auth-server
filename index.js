@@ -1,32 +1,92 @@
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 const db = require('./database');
+const {JWT_SECRET} = require('./constants');
+const {validateJwt} = require('./jwtAuth');
+const randToken = require('rand-token');
+const refreshTokens = {};
 
 const app = express();
 
-// middlewares
 app.use(bodyParser.json());
 
-// Routes
-app.get('/', (req, res) => res.json('Welcome to the auth server'));
+app.get('/', (req, res) => res.json('Howdy'));
 
-app.get('/persons', (req, res) => {
-    res.json(db);
+app.get('/persons', validateJwt, (req, res) => {
+    res.json(db.persons);
 });
 
-app.post('/persons', (req, res) => {
+app.post('/persons', validateJwt, (req, res) => {
     const person = req.body;
     const personId = Object.keys(db).length + 1;
 
-    db[personId] = person;
+    db.persons[personId] = person;
     
     res.status(201).send({message: `created person with id ${personId}`});
 });
 
-app.get('/persons/:id', (req, res) => {
-    const person = db[req.params.id];
+app.get('/persons/:id', validateJwt, (req, res) => {
+    const person = db.persons[req.params.id];
 
     res.json({person});
+});
+
+app.post('/authenticate', (req, res) => {
+    const payloadUser = req.body;
+
+    if (payloadUser.email in db.users) {
+        const dbUser = db.users[payloadUser.email];
+
+        if (payloadUser.password !== dbUser.password) {
+            return res.status(401).json('Invalid credentials');
+        }
+
+        const jwtOptions = {
+            subject: payloadUser.email,
+            expiresIn: '2m'
+        };
+
+        try {
+            const accessToken = jwt.sign({name: dbUser.name}, JWT_SECRET, jwtOptions);
+            const refreshToken = randToken.uid(256);
+    
+            refreshTokens[payloadUser.email] = refreshToken;
+    
+            return res.json({
+                accessToken,
+                refreshToken
+            });
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    }
+
+    res.status(404).json(`User with email ${payloadUser.email} does not exist`);
+});
+
+app.post('/refresh', (req, res) => {
+    const {email, refreshToken} = req.body;
+
+    if (refreshTokens[email] === refreshToken) {
+        const {name} = db.users[email];
+        const jwtOptions = {
+            subject: email,
+            expiresIn: '15m'
+        };
+
+        try {
+            const token = jwt.sign({name}, JWT_SECRET, jwtOptions);
+
+            return res.json({
+                accessToken: token
+            });
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    }
+
+    res.status(404).json(`User with email ${req.body.email} does not exist`);
 });
 
 app.listen(3000, () => console.log('server listening on port 3000'));
