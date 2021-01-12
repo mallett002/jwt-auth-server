@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-const db = require('./database');
-const {JWT_SECRET} = require('./constants');
-const {validateJwt} = require('./jwtAuth');
+const db = require('./src/database');
+const {JWT_SECRET} = require('./src/constants');
+const {validateJwt} = require('./src/jwtAuth');
 const randToken = require('rand-token');
 const refreshTokens = {};
 
@@ -22,7 +22,7 @@ app.post('/persons', validateJwt, (req, res) => {
     const personId = Object.keys(db).length + 1;
 
     db.persons[personId] = person;
-    
+
     res.status(201).send({message: `created person with id ${personId}`});
 });
 
@@ -50,9 +50,9 @@ app.post('/authenticate', (req, res) => {
         try {
             const accessToken = jwt.sign({name: dbUser.name}, JWT_SECRET, jwtOptions);
             const refreshToken = randToken.uid(256);
-    
+
             refreshTokens[payloadUser.email] = refreshToken;
-    
+
             return res.json({
                 accessToken,
                 refreshToken
