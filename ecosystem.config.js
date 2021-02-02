@@ -10,7 +10,7 @@ module.exports = {
       key: '~/.ssh/tutorial.pem',
       ref: 'origin/master',
       repo: 'git@github.com:mallett002/jwt-auth-server.git',
-      path: '/home/ubuntu/tutorial',
+      path: '/home/ubuntu/jwt-auth-server',
       'post-deploy': 'npm install && pm2 startOrRestart ecosystem.config.js'
     }
   }
